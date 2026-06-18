@@ -236,7 +236,7 @@ img {
   position: relative;
   overflow: hidden;
   padding: var(--nav-height) 0;
-  background-color: var(--bg-dark);
+  background-color: transparent;
 }
 
 .hero-container {
@@ -254,6 +254,7 @@ img {
   flex-direction: column;
   align-items: center;
   width: 100%;
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .badge {
@@ -304,7 +305,7 @@ img {
 .credibility-strip {
   padding: 5rem 0;
   text-align: center;
-  background-color: var(--bg-dark);
+  background-color: transparent;
   border-bottom: 1px solid var(--border);
 }
 
@@ -671,7 +672,6 @@ img {
 }
 
 .project-card.horizontal-card:hover {
-  transform: none; /* classical editorial feel: no hover scale/lift */
   box-shadow: none;
   border-color: var(--primary);
 }
@@ -816,7 +816,7 @@ img {
 /* Who I Work With Section */
 .who-i-work-with-section {
   padding: 8rem 0;
-  background-color: var(--bg-dark);
+  background-color: transparent;
 }
 
 .who-i-work-with-section .section-divider-top,
@@ -1016,7 +1016,7 @@ textarea {
 /* Minimal Footer Section */
 .footer-minimal {
   padding: 0 0 5rem 0;
-  background-color: var(--bg-dark); /* Ivory */
+  background-color: transparent;
   color: var(--text-muted);
   font-size: 14px;
   font-family: 'Inter', sans-serif;
@@ -1212,5 +1212,102 @@ textarea {
 
 .project-card:not(.hide) {
   animation: fadeInCard 0.4s ease forwards;
+}
+
+/* 3D Immersive Additions */
+#bg-3d {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+  background-color: transparent;
+  opacity: 0.65;
+}
+
+.service-card, .timeline-item, .project-card {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.service-card:hover, .timeline-item:hover, .project-card:hover {
+  box-shadow: 0 15px 35px rgba(30, 30, 30, 0.04);
+}
+
+/* Float content slightly in 3D space */
+.service-card > *, .timeline-item > *, .project-card > * {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* Base states for diorama card elements */
+.service-card .icon-box,
+.service-card h3,
+.service-card p,
+.timeline-item .timeline-status,
+.timeline-item h3,
+.timeline-item p,
+.timeline-item .progress-bar,
+.project-info-horizontal,
+.project-mockup-horizontal,
+.project-tags-horizontal,
+.project-title-horizontal,
+.project-desc-horizontal,
+.project-link-horizontal,
+.browser-frame {
+  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transform-style: preserve-3d;
+  transform: translateZ(0px);
+}
+
+/* Hover state diorama elevations */
+.service-card:hover .icon-box {
+  transform: translateZ(35px);
+}
+
+.service-card:hover h3 {
+  transform: translateZ(25px);
+}
+
+.service-card:hover p {
+  transform: translateZ(15px);
+}
+
+.timeline-item:hover .timeline-status {
+  transform: translateZ(35px);
+}
+
+.timeline-item:hover h3 {
+  transform: translateZ(25px);
+}
+
+.timeline-item:hover p {
+  transform: translateZ(15px);
+}
+
+.timeline-item:hover .progress-bar {
+  transform: translateZ(20px);
+}
+
+.project-card.horizontal-card:hover .project-tags-horizontal {
+  transform: translateZ(15px);
+}
+
+.project-card.horizontal-card:hover .project-title-horizontal {
+  transform: translateZ(35px);
+}
+
+.project-card.horizontal-card:hover .project-desc-horizontal {
+  transform: translateZ(20px);
+}
+
+.project-card.horizontal-card:hover .project-link-horizontal {
+  transform: translateZ(25px);
+}
+
+.project-card.horizontal-card:hover .browser-frame {
+  transform: translateZ(30px) rotateY(-4deg);
 }
 

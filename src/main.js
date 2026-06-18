@@ -263,3 +263,282 @@ styleEl.textContent = `
   }
 `;
 document.head.appendChild(styleEl);
+
+// --- 3D Immersive Background Scene (Three.js) ---
+function init3DBackground() {
+  const canvas = document.getElementById('bg-3d');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const scene = new THREE.Scene();
+  
+  // Camera setup
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, -10, 75); // positioned slightly back and down
+
+  // Renderer setup
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Undulating 3D Grid Wave configuration
+  const cols = 16;
+  const rows = 16;
+  const vertexCount = cols * rows;
+  const positions = new Float32Array(vertexCount * 3);
+  const indices = [];
+
+  const gridWidth = 150;
+  const gridHeight = 150;
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const i = r * cols + c;
+      // Spread X and Y centered around 0
+      positions[i * 3] = (c / (cols - 1) - 0.5) * gridWidth;
+      positions[i * 3 + 1] = (r / (rows - 1) - 0.5) * gridHeight;
+      positions[i * 3 + 2] = 0;
+    }
+  }
+
+  // Pre-calculate grid lines
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const idx = r * cols + c;
+      // Horizontal segment
+      if (c < cols - 1) {
+        indices.push(idx, idx + 1);
+      }
+      // Vertical segment
+      if (r < rows - 1) {
+        indices.push(idx, idx + cols);
+      }
+    }
+  }
+
+  const pointGeometry = new THREE.BufferGeometry();
+  pointGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const lineGeometry = new THREE.BufferGeometry();
+  lineGeometry.setAttribute('position', pointGeometry.getAttribute('position'));
+  lineGeometry.setIndex(indices);
+
+  // Muted Taupe nodes
+  const particleMaterial = new THREE.PointsMaterial({
+    color: 0x8C8270,
+    size: 2.2,
+    transparent: true,
+    opacity: 0.65,
+    sizeAttenuation: true
+  });
+  const pointSystem = new THREE.Points(pointGeometry, particleMaterial);
+  scene.add(pointSystem);
+
+  // Light Taupe lines
+  const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0xD6CEBC,
+    transparent: true,
+    opacity: 0.25
+  });
+  const lineSystem = new THREE.LineSegments(lineGeometry, lineMaterial);
+  scene.add(lineSystem);
+
+  // Initial tilt for architectural/terrain perspective
+  pointSystem.rotation.x = -Math.PI / 4;
+  lineSystem.rotation.x = -Math.PI / 4;
+  pointSystem.rotation.z = Math.PI / 16;
+  lineSystem.rotation.z = Math.PI / 16;
+
+  // Interaction variables
+  let targetRotationX = 0;
+  let targetRotationY = 0;
+  let currentRotationX = 0;
+  let currentRotationY = 0;
+  
+  let targetScrollY = 0;
+  let currentScrollY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    const mouseX = (e.clientX / window.innerWidth) - 0.5;
+    const mouseY = (e.clientY / window.innerHeight) - 0.5;
+    targetRotationY = mouseX * 0.15;
+    targetRotationX = mouseY * 0.15;
+  });
+
+  window.addEventListener('scroll', () => {
+    targetScrollY = window.scrollY * 0.05;
+  });
+
+  // Track window resize
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Animation Loop
+  let time = 0;
+  const animate = () => {
+    requestAnimationFrame(animate);
+
+    time += 0.006; // smooth wave speed
+
+    const pos = pointGeometry.attributes.position.array;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const i = r * cols + c;
+        const x = pos[i * 3];
+        const y = pos[i * 3 + 1];
+
+        // Wave formula: diagonal undulating landscape ripples
+        const dist = Math.sqrt(x * x + y * y);
+        const wave1 = Math.sin(x * 0.03 + time) * Math.cos(y * 0.03 + time);
+        const wave2 = Math.sin(dist * 0.02 - time * 1.2) * 0.4;
+
+        pos[i * 3 + 2] = (wave1 + wave2) * 9.0;
+      }
+    }
+    pointGeometry.attributes.position.needsUpdate = true;
+
+    // Smooth lerps
+    currentRotationX += (targetRotationX - currentRotationX) * 0.04;
+    currentRotationY += (targetRotationY - currentRotationY) * 0.04;
+    currentScrollY += (targetScrollY - currentScrollY) * 0.04;
+
+    pointSystem.rotation.x = -Math.PI / 4 + currentRotationX;
+    pointSystem.rotation.y = currentRotationY;
+    lineSystem.rotation.x = -Math.PI / 4 + currentRotationX;
+    lineSystem.rotation.y = currentRotationY;
+
+    // Parallax height shift based on scrolling
+    pointSystem.position.y = -5 + currentScrollY * 0.05;
+    lineSystem.position.y = -5 + currentScrollY * 0.05;
+
+    // Continuous slow orbit rotation
+    pointSystem.rotation.z = Math.PI / 16 + time * 0.03;
+    lineSystem.rotation.z = Math.PI / 16 + time * 0.03;
+
+    renderer.render(scene, camera);
+  };
+
+  animate();
+}
+
+// --- 3D Interactive Card Hover Tilt & Hero Parallax ---
+function init3DInteractions() {
+  const cards = document.querySelectorAll('.service-card, .timeline-item, .project-card');
+  const cardStates = [];
+
+  cards.forEach(card => {
+    const state = {
+      card: card,
+      targetX: 0,
+      targetY: 0,
+      currentX: 0,
+      currentY: 0,
+      targetScale: 1,
+      currentScale: 1
+    };
+    cardStates.push(state);
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const width = rect.width;
+      const height = rect.height;
+
+      // Subtle 3D tilt rotation: X-axis rotation depends on Y-mouse position, Y-axis on X-mouse
+      state.targetY = ((x / width) - 0.5) * 15; 
+      state.targetX = -((y / height) - 0.5) * 15; 
+      state.targetScale = 1.025;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      state.targetX = 0;
+      state.targetY = 0;
+      state.targetScale = 1;
+    });
+  });
+
+  // 3D Parallax in Hero
+  const hero = document.getElementById('hero');
+  const heroContent = document.querySelector('.hero-content');
+  const heroState = {
+    targetX: 0,
+    targetY: 0,
+    currentX: 0,
+    currentY: 0,
+    targetRotX: 0,
+    targetRotY: 0,
+    currentRotX: 0,
+    currentRotY: 0
+  };
+
+  if (hero && heroContent) {
+    hero.addEventListener('mousemove', (e) => {
+      const mouseX = (e.clientX / window.innerWidth) - 0.5;
+      const mouseY = (e.clientY / window.innerHeight) - 0.5;
+
+      heroState.targetX = mouseX * 25;
+      heroState.targetY = mouseY * 25;
+      heroState.targetRotY = mouseX * 12;
+      heroState.targetRotX = -mouseY * 12;
+    });
+
+    hero.addEventListener('mouseleave', () => {
+      heroState.targetX = 0;
+      heroState.targetY = 0;
+      heroState.targetRotX = 0;
+      heroState.targetRotY = 0;
+    });
+  }
+
+  // Central animation frame loop for all hover interactions
+  const updateInteractions = () => {
+    requestAnimationFrame(updateInteractions);
+
+    // Update tilt cards
+    cardStates.forEach(state => {
+      state.currentX += (state.targetX - state.currentX) * 0.08;
+      state.currentY += (state.targetY - state.currentY) * 0.08;
+      state.currentScale += (state.targetScale - state.currentScale) * 0.08;
+
+      state.card.style.transform = `perspective(1000px) rotateX(${state.currentX.toFixed(2)}deg) rotateY(${state.currentY.toFixed(2)}deg) scale3d(${state.currentScale.toFixed(3)}, ${state.currentScale.toFixed(3)}, ${state.currentScale.toFixed(3)})`;
+    });
+
+    // Update hero parallax
+    if (hero && heroContent) {
+      heroState.currentX += (heroState.targetX - heroState.currentX) * 0.08;
+      heroState.currentY += (heroState.targetY - heroState.currentY) * 0.08;
+      heroState.currentRotX += (heroState.targetRotX - heroState.currentRotX) * 0.08;
+      heroState.currentRotY += (heroState.targetRotY - heroState.currentRotY) * 0.08;
+
+      heroContent.style.transform = `perspective(1000px) translate3d(${heroState.currentX.toFixed(2)}px, ${heroState.currentY.toFixed(2)}px, 0) rotateX(${heroState.currentRotX.toFixed(2)}deg) rotateY(${heroState.currentRotY.toFixed(2)}deg)`;
+    }
+  };
+
+  updateInteractions();
+}
+
+// Start interactive scenes
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    init3DBackground();
+    init3DInteractions();
+  });
+} else {
+  init3DBackground();
+  init3DInteractions();
+}
+
+// Start interactive scenes
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    init3DBackground();
+    init3DInteractions();
+  });
+} else {
+  init3DBackground();
+  init3DInteractions();
+}

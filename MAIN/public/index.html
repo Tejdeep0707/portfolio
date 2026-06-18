@@ -7,13 +7,16 @@
     <title>Tejdeep | Full Stack Developer & AI Specialist</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..600;1,400..600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script type="module" crossorigin src="/assets/index-Bp2LLcTu.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Cv_-LBd2.css">
+    <script type="module" crossorigin src="/assets/index-Ds4dlEKV.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DjeedF8H.css">
   </head>
   <body>
     <canvas id="bg-3d"></canvas>
+    <div class="ambient-glow-1"></div>
+    <div class="ambient-glow-2"></div>
+    <div class="ambient-glow-3"></div>
     <nav id="navbar">
       <div class="container nav-container">
         <a href="#" class="logo">TEJDEEP</a>
@@ -38,15 +41,27 @@
     <main>
       <!-- Hero Section -->
       <section id="hero">
+        <video autoplay muted loop playsinline class="hero-video-bg">
+          <source src="/videos/blackhole.webm" type="video/webm" />
+        </video>
         <div class="container hero-container">
           <div class="hero-content">
-            <span class="badge">AVAILABLE FOR PROJECTS</span>
-            <h1>Websites built for businesses that take pride in their work.</h1>
-            <p class="hero-subheadline">Cafes, dental clinics, and restaurants — India and worldwide.</p>
-            <hr class="hero-divider">
-            <div class="hero-btns">
-              <a href="#contact" class="btn btn-primary">Hire Me</a>
-              <a href="#projects" class="btn btn-secondary">View My Work</a>
+            <div class="hero-text-content">
+              <div class="welcome-box">
+                <svg class="sparkles-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                  <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/>
+                </svg>
+                <span>AVAILABLE FOR PROJECTS</span>
+              </div>
+              <h1>Websites built for businesses that take pride in their work.</h1>
+              <p class="hero-subheadline">Cafes, dental clinics, and restaurants — India and worldwide.</p>
+              <div class="hero-btns">
+                <a href="#contact" class="btn btn-primary">Hire Me</a>
+                <a href="#projects" class="btn btn-secondary">View My Work</a>
+              </div>
+            </div>
+            <div class="hero-graphics">
+              <img src="/hero-bg.svg" alt="tech stack icons" class="hero-icons-img" draggable="false" />
             </div>
           </div>
         </div>
@@ -62,6 +77,11 @@
 
       <!-- Services Section -->
       <section id="services" class="section">
+        <div class="services-video-container">
+          <video autoplay muted loop playsinline class="services-video-bg">
+            <source src="/videos/skills-bg.webm" type="video/webm" />
+          </video>
+        </div>
         <div class="container">
           <div class="section-header">
             <span class="section-eyebrow">CAPABILITIES</span>
@@ -297,6 +317,11 @@
 
       <!-- Contact Section -->
       <section id="contact" class="section">
+        <div class="contact-video-container">
+          <video autoplay muted loop playsinline class="contact-video-bg">
+            <source src="/videos/encryption-bg.webm" type="video/webm" />
+          </video>
+        </div>
         <div class="container contact-container">
           <div class="contact-info">
             <span class="section-eyebrow">GET IN TOUCH</span>
@@ -340,6 +365,59 @@
         </div>
       </div>
     </footer>
+
+    <!-- Cyberpunk Neural HUD Control Panel -->
+    <div id="cyber-hud" class="cyber-hud">
+      <div class="hud-header" id="hud-header">
+        <div class="hud-blink-dot"></div>
+        <span class="hud-title">SYSTEM CONTROL PANEL</span>
+        <button class="hud-collapse-btn" id="hud-toggle">—</button>
+      </div>
+      <div class="hud-body" id="hud-body">
+        <div class="hud-section">
+          <div class="hud-label">COGNITIVE SKIN SELECTOR</div>
+          <div class="hud-skin-grid">
+            <button class="hud-btn active" data-skin="cyber">CYBER</button>
+            <button class="hud-btn" data-skin="wireframe">GRID</button>
+            <button class="hud-btn" data-skin="gold">GOLD</button>
+            <button class="hud-btn" data-skin="hologram">HOLO</button>
+          </div>
+        </div>
+        <div class="hud-section">
+          <div class="hud-label">QUANTUM CODES & SPEED</div>
+          <div class="hud-slider-group">
+            <span>ROTATION</span>
+            <input type="range" id="hud-spin" min="0" max="100" value="30">
+          </div>
+          <div class="hud-slider-group">
+            <span>WOBBLE</span>
+            <input type="range" id="hud-wobble" min="0" max="100" value="20">
+          </div>
+        </div>
+        <div class="hud-section">
+          <div class="hud-label">PHYSICS MATRIX</div>
+          <label class="hud-toggle-container">
+            <span>ANTI-GRAVITY</span>
+            <input type="checkbox" id="hud-gravity" checked>
+            <span class="hud-checkmark"></span>
+          </label>
+        </div>
+        <div class="hud-footer">
+          <div class="hud-status-row">
+            <span>HOST SYSTEM</span>
+            <span class="cyan-text">TEJDEEP-OS v1.0.4</span>
+          </div>
+          <div class="hud-status-row">
+            <span>COGNITIVE CORE</span>
+            <span class="pink-text">GEMINI-3.5-FLASH</span>
+          </div>
+          <div class="hud-status-row animate-pulse">
+            <span>PULSE FREQ</span>
+            <span class="green-text" id="hud-fps">60 FPS</span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Toast Notification Container -->
     <div id="toast-container" class="toast-container"></div>
